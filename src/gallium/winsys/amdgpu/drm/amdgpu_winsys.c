@@ -288,9 +288,15 @@ static boolean do_winsys_init(struct amdgpu_winsys *ws)
    ws->info.si_tile_mode_array_valid = TRUE;
    ws->info.enabled_rb_mask = ws->amdinfo.enabled_rb_pipes_mask;
 
-   memcpy(ws->info.cik_macrotile_mode_array, ws->amdinfo.gb_macro_tile_mode,
-          sizeof(ws->amdinfo.gb_macro_tile_mode));
-   ws->info.cik_macrotile_mode_array_valid = TRUE;
+   if (ws->family <= FAMILY_SI) {
+      memset(ws->info.cik_macrotile_mode_array, 0, sizeof(ws->info.cik_macrotile_mode_array));
+      ws->info.cik_macrotile_mode_array_valid = FALSE;
+      ws->info.gfx_ib_pad_with_type2 = TRUE;
+   } else {
+      memcpy(ws->info.cik_macrotile_mode_array, ws->amdinfo.gb_macro_tile_mode,
+             sizeof(ws->amdinfo.gb_macro_tile_mode));
+      ws->info.cik_macrotile_mode_array_valid = TRUE;
+   }
 
    ws->gart_page_size = alignment_info.size_remote;
 
